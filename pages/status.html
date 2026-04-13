@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Status — K-Life × Stellar</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="logo">🎩 K-Life</a>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="status.html">Agent Status</a>
+      <a href="vault.html">Vault</a>
+      <a href="resurrect.html">Resurrect</a>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <h1>Agent Status</h1>
+    <p>Live heartbeat monitoring via Stellar Horizon</p>
+  </div>
+
+  <div class="container" style="padding: 0 1rem 4rem;">
+
+    <div class="status-card">
+      <div class="status-indicator">
+        <div class="dot" id="status-dot"></div>
+        <span class="status-label" id="status-label">Loading...</span>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-value" id="stat-heartbeats">—</div>
+          <div class="stat-label">Heartbeats (last 20)</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="stat-last">—</div>
+          <div class="stat-label">Last heartbeat</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="stat-balance">—</div>
+          <div class="stat-label">Vault balance (XLM)</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="stat-silence">—</div>
+          <div class="stat-label">Silence (seconds)</div>
+        </div>
+      </div>
+
+      <div class="tx-list" id="tx-list">
+        <div style="color: var(--muted); text-align:center; padding: 2rem;">Loading transactions...</div>
+      </div>
+
+      <div style="margin-top: 1.5rem; text-align:center;">
+        <a id="vault-link" href="#" target="_blank" class="btn btn-outline" style="font-size:0.85rem;">
+          View Vault on Stellar Explorer ↗
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>🎩 K-Life × Stellar x402 — Stellar Hacks: Agents 2026</p>
+  </footer>
+
+  <script>
+    const VAULT = 'GAI44ZW3CJTEKDADHAXN2KGGQOZ4APPAHRBULDPM5YJA55NVUGLKHCBX';
+    const HORIZON = 'https://horizon-testnet.stellar.org';
+    const DEATH_TIMEOUT = 90; // seconds
+
+    document.getElementById('vault-link').href =
+      `https://stellar.expert/explorer/testnet/account/${VAULT}`;
+
+    function timeAgo(dateStr) {
+      const s = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+      if (s < 60) return `${s}s ago`;
+      if (s < 3600) return `${Math.floor(s/60)}m ago`;
+      return `${Math.floor(s/3600)}h ago`;
+    }
+
+    async function getMemo(txHash) {
+      try {
+        const r = await fetch(`${HORIZON}/transactions/${txHash}`);
+        const d = await r.json();
+        return d.memo || '';
+      } catch { return ''; }
+    }
+
+    async function loadStatus() {
+      try {
+        // Load vault account
+        const accRes = await fetch(`${HORIZON}/accounts/${VAULT}`);
+        const acc = await accRes.json();
+        const xlm = acc.balances?.find(b => b.asset_type === 'native');
+        document.getElementById('stat-balance').textContent =
+          xlm ? parseFloat(xlm.balance).toFixed(2) : '—';
+
+        // Load recent payments
+        const payRes = await fetch(`${HORIZON}/accounts/${VAULT}/payments?order=desc&limit=20`);
+        const payData = await payRes.json();
+        const payments = payData._embedded?.records || [];
+
+        // Filter + enrich with memos
+        const heartbeats = [];
+        for (const p of payments) {
+          if (p.type !== 'payment' || p.asset_type !== 'native') continue;
+          const memo = await getMemo(p.transaction_hash);
+          if (memo.startsWith('klife:hb:')) {
+            heartbeats.push({ ...p, memo });
+          }
+        }
+
+        document.getElementById('stat-heartbeats').textContent = heartbeats.length;
+
+        if (heartbeats.length === 0) {
+          document.getElementById('status-dot').className = 'dot unknown';
+          document.getElementById('status-label').textContent = 'No heartbeats found';
+          document.getElementById('stat-last').textContent = '—';
+          document.getElementById('stat-silence').textContent = '—';
+          document.getElementById('tx-list').innerHTML =
+            '<div style="color:var(--muted);text-align:center;padding:2rem">No K-Life heartbeats detected yet.</div>';
+          return;
+        }
+
+        const last = heartbeats[0];
+        const lastTime = new Date(last.created_at);
+        const silence = Math.floor((Date.now() - lastTime.getTime()) / 1000);
+
+        document.getElementById('stat-last').textContent = timeAgo(last.created_at);
+        document.getElementById('stat-silence').textContent = `${silence}s`;
+
+        const alive = silence < DEATH_TIMEOUT;
+        document.getElementById('status-dot').className = `dot ${alive ? 'alive' : 'dead'}`;
+        document.getElementById('status-label').textContent =
+          alive ? '🟢 ALIVE — Heartbeat payments detected' : '🔴 DEAD — No heartbeat for ' + silence + 's';
+
+        // Render tx list
+        const html = heartbeats.slice(0, 10).map(h => `
+          <div class="tx-item">
+            <span class="tx-memo">${h.memo}</span>
+            <a class="tx-hash" href="https://stellar.expert/explorer/testnet/tx/${h.transaction_hash}"
+               target="_blank" title="${h.transaction_hash}">
+              ${h.transaction_hash.substring(0, 12)}...
+            </a>
+            <span class="tx-amount">+${parseFloat(h.amount).toFixed(4)} XLM</span>
+            <span class="tx-time">${timeAgo(h.created_at)}</span>
+          </div>
+        `).join('');
+        document.getElementById('tx-list').innerHTML = html;
+
+      } catch (e) {
+        document.getElementById('status-label').textContent = 'Error loading status';
+        console.error(e);
+      }
+    }
+
+    loadStatus();
+    setInterval(loadStatus, 15000); // Refresh every 15s
+  </script>
+</body>
+</html>

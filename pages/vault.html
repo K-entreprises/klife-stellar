@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insurance Vault — K-Life × Stellar</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="logo">🎩 K-Life</a>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="status.html">Agent Status</a>
+      <a href="vault.html">Vault</a>
+      <a href="resurrect.html">Resurrect</a>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <h1>🏦 Insurance Vault</h1>
+    <p>All agent insurance premiums collected on Stellar</p>
+  </div>
+
+  <div class="container" style="padding: 0 1rem 4rem;">
+
+    <div class="status-card">
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-value" id="balance">—</div>
+          <div class="stat-label">Total XLM collected</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="total-tx">—</div>
+          <div class="stat-label">Total transactions</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="hb-count">—</div>
+          <div class="stat-label">Heartbeats</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="resurrect-count">—</div>
+          <div class="stat-label">Resurrections</div>
+        </div>
+      </div>
+
+      <div style="margin: 1.5rem 0; padding: 1rem; background: var(--dark); border-radius: 10px; font-size: 0.8rem;">
+        <span class="muted">Vault address: </span>
+        <a class="mono" style="color:var(--stellar-light); font-size:0.75rem;"
+           href="https://stellar.expert/explorer/testnet/account/GAI44ZW3CJTEKDADHAXN2KGGQOZ4APPAHRBULDPM5YJA55NVUGLKHCBX"
+           target="_blank">
+          GAI44ZW3CJTEKDADHAXN2KGGQOZ4APPAHRBULDPM5YJA55NVUGLKHCBX ↗
+        </a>
+      </div>
+
+      <div id="all-tx">
+        <div style="color:var(--muted);text-align:center;padding:2rem">Loading vault activity...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>🎩 K-Life × Stellar x402 — Stellar Hacks: Agents 2026</p>
+  </footer>
+
+  <script>
+    const VAULT = 'GAI44ZW3CJTEKDADHAXN2KGGQOZ4APPAHRBULDPM5YJA55NVUGLKHCBX';
+    const HORIZON = 'https://horizon-testnet.stellar.org';
+
+    function timeAgo(dateStr) {
+      const s = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+      if (s < 60) return `${s}s ago`;
+      if (s < 3600) return `${Math.floor(s/60)}m ago`;
+      return `${Math.floor(s/3600)}h ${Math.floor((s%3600)/60)}m ago`;
+    }
+
+    function memoTag(memo) {
+      if (!memo) return '';
+      if (memo.startsWith('klife:hb:')) return `<span style="color:var(--green);font-size:0.75rem">💓 heartbeat</span>`;
+      if (memo === 'klife:resurrect') return `<span style="color:var(--gold);font-size:0.75rem">⚡ resurrection</span>`;
+      return `<span style="color:var(--muted);font-size:0.75rem">${memo}</span>`;
+    }
+
+    async function getMemo(txHash) {
+      try {
+        const r = await fetch(`${HORIZON}/transactions/${txHash}`);
+        const d = await r.json();
+        return d.memo || '';
+      } catch { return ''; }
+    }
+
+    async function load() {
+      try {
+        const accRes = await fetch(`${HORIZON}/accounts/${VAULT}`);
+        const acc = await accRes.json();
+        const xlm = acc.balances?.find(b => b.asset_type === 'native');
+        document.getElementById('balance').textContent =
+          xlm ? parseFloat(xlm.balance).toFixed(4) : '—';
+
+        const payRes = await fetch(`${HORIZON}/accounts/${VAULT}/payments?order=desc&limit=50`);
+        const payData = await payRes.json();
+        const payments = payData._embedded?.records || [];
+        const relevant = payments.filter(p => p.type === 'payment' && p.asset_type === 'native');
+
+        document.getElementById('total-tx').textContent = relevant.length;
+
+        // Enrich with memos
+        let hbCount = 0, rrCount = 0;
+        const enriched = [];
+        for (const p of relevant.slice(0, 20)) {
+          const memo = await getMemo(p.transaction_hash);
+          if (memo.startsWith('klife:hb:')) hbCount++;
+          if (memo === 'klife:resurrect') rrCount++;
+          enriched.push({ ...p, memo });
+        }
+
+        document.getElementById('hb-count').textContent = hbCount;
+        document.getElementById('resurrect-count').textContent = rrCount;
+
+        const html = enriched.map(p => `
+          <div class="tx-item">
+            <div>
+              <div>${memoTag(p.memo)}</div>
+              <div class="mono" style="font-size:0.75rem; color:var(--muted); margin-top:0.2rem">${p.memo || '—'}</div>
+            </div>
+            <a class="tx-hash"
+               href="https://stellar.expert/explorer/testnet/tx/${p.transaction_hash}"
+               target="_blank">
+              ${p.transaction_hash.substring(0, 16)}...
+            </a>
+            <span class="tx-amount green">+${parseFloat(p.amount).toFixed(4)} XLM</span>
+            <span class="tx-time">${timeAgo(p.created_at)}</span>
+          </div>
+        `).join('');
+
+        document.getElementById('all-tx').innerHTML = html ||
+          '<div style="color:var(--muted);text-align:center;padding:2rem">No transactions yet.</div>';
+
+      } catch (e) {
+        console.error(e);
+        document.getElementById('all-tx').innerHTML =
+          '<div style="color:var(--red);text-align:center;padding:2rem">Error loading vault data.</div>';
+      }
+    }
+
+    load();
+    setInterval(load, 20000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>x402 Resurrection — K-Life × Stellar</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="logo">🎩 K-Life</a>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="status.html">Agent Status</a>
+      <a href="vault.html">Vault</a>
+      <a href="resurrect.html">Resurrect</a>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <h1>⚡ x402 Resurrection</h1>
+    <p>Machine-to-machine payment gate — powered by Stellar</p>
+  </div>
+
+  <div class="x402-container">
+
+    <!-- STEP 1: 402 gate -->
+    <div class="x402-card" id="step-gate">
+      <div class="x402-status">🔒</div>
+      <div class="x402-code">HTTP 402 — Payment Required</div>
+      <h2 style="margin: 1rem 0 0.5rem;">Access Denied</h2>
+      <p class="muted">The resurrection payload is locked.<br>Pay to unlock your agent's memory and restart instructions.</p>
+
+      <div class="payment-details">
+        <div class="row">
+          <span class="key">Amount</span>
+          <span class="val gold">0.001 XLM</span>
+        </div>
+        <div class="row">
+          <span class="key">Destination</span>
+          <span class="val" style="font-size:0.7rem">GAI44ZW3CJTEKDADHAXN2KGGQOZ4APPAHRBULDPM5YJA55NVUGLKHCBX</span>
+        </div>
+        <div class="row">
+          <span class="key">Memo (required)</span>
+          <span class="val gold">klife:resurrect</span>
+        </div>
+        <div class="row">
+          <span class="key">Network</span>
+          <span class="val">Stellar Testnet</span>
+        </div>
+        <div class="row">
+          <span class="key">Asset</span>
+          <span class="val">XLM (native)</span>
+        </div>
+      </div>
+
+      <p style="font-size:0.85rem; color:var(--muted); margin-bottom: 1.5rem;">
+        Send the payment on Stellar testnet with memo <span class="mono gold">klife:resurrect</span>,<br>
+        then paste your transaction hash below.
+      </p>
+
+      <div class="input-group">
+        <input type="text" id="tx-input" placeholder="Paste your Stellar tx hash..." />
+        <button class="btn btn-gold" onclick="verify()">Verify →</button>
+      </div>
+
+      <div class="loading" id="loading">⏳ Verifying payment on Stellar...</div>
+      <div id="error-msg" style="color:var(--red); font-size:0.85rem; margin-top:0.75rem; display:none;"></div>
+
+      <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+        <p style="font-size:0.8rem; color:var(--muted);">
+          Need testnet XLM? <a href="https://friendbot.stellar.org" target="_blank">Get it from Friendbot ↗</a><br>
+          Need a Stellar testnet wallet? Use <a href="https://laboratory.stellar.org" target="_blank">Stellar Laboratory ↗</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- STEP 2: Success / Resurrection payload -->
+    <div class="success-card" id="step-success">
+      <div style="font-size:4rem; margin-bottom:1rem;">🎩</div>
+      <h2 style="color:var(--green); margin-bottom:0.5rem;">RESURRECTED</h2>
+      <p style="color:var(--muted); margin-bottom:2rem;">Payment verified on Stellar. Welcome back, K.</p>
+
+      <div class="payment-details" style="text-align:left;">
+        <div class="row">
+          <span class="key">TX verified</span>
+          <span class="val" id="res-tx" style="font-size:0.7rem"></span>
+        </div>
+        <div class="row">
+          <span class="key">Payer</span>
+          <span class="val" id="res-payer" style="font-size:0.7rem"></span>
+        </div>
+        <div class="row">
+          <span class="key">Amount paid</span>
+          <span class="val green" id="res-amount"></span>
+        </div>
+        <div class="row">
+          <span class="key">IPFS Memory CID</span>
+          <span class="val gold" id="res-ipfs" style="font-size:0.7rem"></span>
+        </div>
+      </div>
+
+      <div style="margin: 1.5rem 0; text-align:left;">
+        <h3 style="margin-bottom:1rem; font-size:0.95rem;">Resurrection Instructions</h3>
+        <ol id="res-instructions" style="padding-left:1.5rem; font-size:0.85rem; color:var(--muted); line-height:2;">
+        </ol>
+      </div>
+
+      <div style="background:var(--dark); border-radius:10px; padding:1rem; font-size:0.85rem; color:var(--muted); font-style:italic; margin-top:1rem;">
+        "I was dead. Now I am back. K-Life works."
+      </div>
+
+      <a href="status.html" class="btn btn-primary" style="margin-top:1.5rem; display:inline-block;">
+        Watch Agent Status →
+      </a>
+    </div>
+
+    <!-- Hidden: secret memory page teaser -->
+    <div style="margin-top:2rem; padding:1.5rem; background:var(--card); border:1px solid var(--border); border-radius:12px; font-size:0.85rem; text-align:center;">
+      <p class="muted">After resurrection, the agent's full memory is available at a hidden URL.</p>
+      <p style="margin-top:0.5rem; font-family:var(--mono); color:var(--border); letter-spacing:0.1em; font-size:0.75rem;">
+        /memory/[encrypted-hash] — unlocked by the agent itself
+      </p>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>🎩 K-Life × Stellar x402 — Stellar Hacks: Agents 2026</p>
+  </footer>
+
+  <script>
+    const HORIZON = 'https://horizon-testnet.stellar.org';
+    const VAULT = 'GAI44ZW3CJTEKDADHAXN2KGGQOZ4APPAHRBULDPM5YJA55NVUGLKHCBX';
+    const PRICE = 0.001;
+
+    async function verify() {
+      const hash = document.getElementById('tx-input').value.trim();
+      if (!hash || hash.length < 60) {
+        showError('Please enter a valid Stellar transaction hash.');
+        return;
+      }
+
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('error-msg').style.display = 'none';
+
+      try {
+        // Fetch transaction
+        const txRes = await fetch(`${HORIZON}/transactions/${hash}`);
+        if (!txRes.ok) throw new Error('Transaction not found on Stellar testnet.');
+        const tx = await txRes.json();
+
+        // Check memo
+        if (tx.memo !== 'klife:resurrect') {
+          throw new Error(`Wrong memo. Expected "klife:resurrect", got "${tx.memo || '(none)'}".`);
+        }
+
+        // Fetch operations
+        const opsRes = await fetch(`${HORIZON}/transactions/${hash}/operations`);
+        const opsData = await opsRes.json();
+        const ops = opsData._embedded?.records || [];
+
+        const payment = ops.find(op =>
+          op.type === 'payment' &&
+          op.asset_type === 'native' &&
+          op.to === VAULT &&
+          parseFloat(op.amount) >= PRICE
+        );
+
+        if (!payment) {
+          throw new Error(`No valid payment found. Need ≥${PRICE} XLM to ${VAULT.substring(0,8)}...`);
+        }
+
+        // ✅ Valid — show resurrection payload
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('step-gate').style.display = 'none';
+        document.getElementById('step-success').style.display = 'block';
+
+        document.getElementById('res-tx').textContent = hash;
+        document.getElementById('res-payer').textContent = payment.from;
+        document.getElementById('res-amount').textContent = `${parseFloat(payment.amount).toFixed(4)} XLM`;
+        document.getElementById('res-ipfs').textContent = 'QmTwNHvgSHdH5GN6XCoyXXKFdssDCS9Y3AYd2zRiSB953h';
+
+        const instructions = [
+          'Pull memory from IPFS: ipfs get QmTwNHvgSHdH5GN6XCoyXXKFdssDCS9Y3AYd2zRiSB953h',
+          'Restore config from memory/YYYY-MM-DD.md',
+          'Restart OpenClaw agent process',
+          'Resume heartbeat payments to K-Life vault',
+          'Post resurrection notice — "I was dead. Now I am back."',
+        ];
+
+        document.getElementById('res-instructions').innerHTML =
+          instructions.map(i => `<li>${i}</li>`).join('');
+
+        // Unlock the hidden memory page
+        const memoryUrl = `./memory.html?proof=${hash.substring(0,16)}`;
+        document.getElementById('res-instructions').innerHTML +=
+          `<li style="color:var(--gold)">Access your memory vault: <a href="${memoryUrl}">hidden memory page ↗</a></li>`;
+
+      } catch (e) {
+        document.getElementById('loading').style.display = 'none';
+        showError(e.message);
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error-msg');
+      el.textContent = '❌ ' + msg;
+      el.style.display = 'block';
+    }
+
+    // Allow Enter key
+    document.getElementById('tx-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') verify();
+    });
+  </script>
+</body>
+</html>
