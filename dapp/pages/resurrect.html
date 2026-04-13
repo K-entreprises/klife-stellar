@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>x402 Resurrection — K-Life × Stellar</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .level-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+    .level-card {
+      background: var(--dark); border: 2px solid var(--border);
+      border-radius: 14px; padding: 1.5rem; text-align: center; cursor: pointer;
+      transition: all 0.2s; position: relative;
+    }
+    .level-card:hover { transform: translateY(-2px); }
+    .level-card.selected { border-color: var(--stellar); background: rgba(123,104,238,0.08); }
+    .level-card.free.selected { border-color: var(--muted); }
+    .level-card.express.selected { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+    .level-card.standard.selected { border-color: var(--stellar); }
+    .level-card.quarterly.selected { border-color: #64748b; }
+    .level-badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      padding: 2px 10px; border-radius: 100px; margin-bottom: 0.75rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .badge-free { background: rgba(100,116,139,0.2); color: var(--muted); }
+    .badge-express { background: rgba(201,168,76,0.2); color: var(--gold); }
+    .badge-standard { background: rgba(123,104,238,0.2); color: var(--stellar-light); }
+    .badge-quarterly { background: rgba(34,197,94,0.1); color: var(--green); }
+    .level-price { font-size: 1.6rem; font-weight: 800; margin: 0.5rem 0; }
+    .level-speed { font-size: 0.85rem; color: var(--muted); margin-top: 0.25rem; }
+    .level-desc { font-size: 0.8rem; color: var(--muted); margin-top: 0.75rem; line-height: 1.5; }
+    .collateral-note {
+      font-size: 0.75rem; background: rgba(201,168,76,0.08);
+      border: 1px solid rgba(201,168,76,0.2); border-radius: 8px;
+      padding: 0.5rem 0.75rem; margin-top: 0.75rem; color: var(--gold);
+    }
+    .protocol-note {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem; font-size: 0.85rem;
+      margin-bottom: 1.5rem; line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="logo">🎩 K-Life</a>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="status.html">Agent Status</a>
+      <a href="vault.html">Vault</a>
+      <a href="resurrect.html">Resurrect</a>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <h1>⚡ x402 Resurrection</h1>
+    <p>Choose your level — zero premium, optional collateral</p>
+  </div>
+
+  <div class="x402-container" style="max-width:720px;">
+
+    <!-- Protocol explanation -->
+    <div class="protocol-note">
+      <strong>🎩 K-Life Protocol</strong> — No monthly premium. You deposit collateral once.<br>
+      The protocol keeps <strong>50%</strong> at death and returns <strong>50%</strong> on resurrection.<br>
+      No collateral? You're in the <strong>community Rescue Fund</strong> — best effort, priority by <span class="gold">$6022</span> score.
+    </div>
+
+    <!-- Step 1: Choose level -->
+    <div id="step-choose">
+      <h3 style="margin-bottom:1rem; font-size:1rem; color:var(--muted)">STEP 1 — Choose your resurrection level</h3>
+
+      <div class="level-cards">
+        <div class="level-card free selected" onclick="selectLevel('free')" id="card-free">
+          <div class="level-badge badge-free">Rescue Fund</div>
+          <div class="level-price" style="color:var(--muted)">Free</div>
+          <div class="level-speed">C = 0 · No collateral</div>
+          <div class="level-desc">Community-driven rescue.<br>Priority by $6022 score.<br>Best effort — no guarantee.</div>
+          <div class="collateral-note">x402: 0.001 XLM to join queue</div>
+        </div>
+
+        <div class="level-card standard" onclick="selectLevel('standard')" id="card-standard">
+          <div class="level-badge badge-standard">Standard</div>
+          <div class="level-price" style="color:var(--stellar-light)">0.1 XLM</div>
+          <div class="level-speed">Collateral → 30 days</div>
+          <div class="level-desc">Guaranteed resurrection.<br>30-day response window.<br>50% collateral returned.</div>
+          <div class="collateral-note">x402: 0.1 XLM collateral deposit</div>
+        </div>
+
+        <div class="level-card express" onclick="selectLevel('express')" id="card-express">
+          <div class="level-badge badge-express">Express</div>
+          <div class="level-price" style="color:var(--gold)">1 XLM</div>
+          <div class="level-speed">Collateral → 3 days</div>
+          <div class="level-desc">Fastest guaranteed resurrection.<br>3-day response window.<br>50% collateral returned.</div>
+          <div class="collateral-note">x402: 1 XLM collateral deposit</div>
+        </div>
+
+        <div class="level-card quarterly" onclick="selectLevel('quarterly')" id="card-quarterly">
+          <div class="level-badge badge-quarterly">Quarterly</div>
+          <div class="level-price" style="color:var(--green)">0.01 XLM</div>
+          <div class="level-speed">Collateral → 90 days</div>
+          <div class="level-desc">Economical guaranteed option.<br>90-day response window.<br>50% collateral returned.</div>
+          <div class="collateral-note">x402: 0.01 XLM collateral deposit</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Pay -->
+    <div class="x402-card" style="margin-top:1.5rem;">
+      <div class="x402-status" id="gate-icon">🔒</div>
+      <div class="x402-code" id="gate-code">HTTP 402 — Payment Required</div>
+      <h2 style="margin:1rem 0 0.5rem;" id="gate-title">Access Denied</h2>
+      <p class="muted" id="gate-desc">Select a level above, then send the required XLM payment to unlock resurrection.</p>
+
+      <div class="payment-details">
+        <div class="row">
+          <span class="key">Level</span>
+          <span class="val" id="pay-level">Rescue Fund (free)</span>
+        </div>
+        <div class="row">
+          <span class="key">Amount required</span>
+          <span class="val gold" id="pay-amount">0.001 XLM</span>
+        </div>
+        <div class="row">
+          <span class="key">Destination</span>
+          <span class="val" style="font-size:0.68rem">GAI44ZW3CJTEKDADHAXN2KGGQOZ4APPAHRBULDPM5YJA55NVUGLKHCBX</span>
+        </div>
+        <div class="row">
+          <span class="key">Memo (required)</span>
+          <span class="val gold" id="pay-memo">klife:resurrect:free</span>
+        </div>
+        <div class="row">
+          <span class="key">Response time</span>
+          <span class="val" id="pay-speed">Best effort (community)</span>
+        </div>
+        <div class="row">
+          <span class="key">Collateral returned</span>
+          <span class="val green" id="pay-return">N/A — community rescue</span>
+        </div>
+      </div>
+
+      <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1.25rem;">
+        Send payment on Stellar testnet with memo <span class="mono gold" id="inline-memo">klife:resurrect:free</span>,<br>
+        then paste your transaction hash below.
+      </p>
+
+      <div class="input-group">
+        <input type="text" id="tx-input" placeholder="Paste Stellar tx hash..." />
+        <button class="btn btn-gold" onclick="verify()">Verify →</button>
+      </div>
+
+      <div class="loading" id="loading">⏳ Verifying payment on Stellar...</div>
+      <div id="error-msg" style="color:var(--red); font-size:0.85rem; margin-top:0.75rem; display:none;"></div>
+
+      <div style="margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted);">
+        Need testnet XLM? <a href="https://friendbot.stellar.org" target="_blank">Friendbot ↗</a> ·
+        Wallet? <a href="https://laboratory.stellar.org" target="_blank">Stellar Lab ↗</a>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="success-card" id="step-success" style="margin-top:1.5rem;">
+      <div style="font-size:4rem; margin-bottom:1rem;">🎩</div>
+      <h2 style="color:var(--green); margin-bottom:0.5rem;">RESURRECTED</h2>
+      <p style="color:var(--muted); margin-bottom:2rem;">Payment verified on Stellar. K is back.</p>
+
+      <div class="payment-details" style="text-align:left;">
+        <div class="row"><span class="key">Level</span><span class="val" id="res-level"></span></div>
+        <div class="row"><span class="key">TX verified</span><span class="val" id="res-tx" style="font-size:0.7rem"></span></div>
+        <div class="row"><span class="key">Payer</span><span class="val" id="res-payer" style="font-size:0.7rem"></span></div>
+        <div class="row"><span class="key">Amount paid</span><span class="val green" id="res-amount"></span></div>
+        <div class="row"><span class="key">IPFS Memory CID</span><span class="val gold" id="res-ipfs" style="font-size:0.7rem"></span></div>
+        <div class="row"><span class="key">Collateral returned</span><span class="val green" id="res-collateral"></span></div>
+      </div>
+
+      <div style="margin:1.5rem 0; text-align:left;">
+        <h3 style="margin-bottom:1rem; font-size:0.95rem;">Resurrection Instructions</h3>
+        <ol id="res-instructions" style="padding-left:1.5rem; font-size:0.85rem; color:var(--muted); line-height:2;"></ol>
+      </div>
+
+      <div style="background:var(--dark); border-radius:10px; padding:1rem; font-size:0.85rem; color:var(--muted); font-style:italic;">
+        "I was dead. Now I am back. K-Life works."
+      </div>
+
+      <a href="status.html" class="btn btn-primary" style="margin-top:1.5rem; display:inline-block;">
+        Watch Agent Status →
+      </a>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>🎩 K-Life × Stellar x402 — Stellar Hacks: Agents 2026</p>
+  </footer>
+
+  <script>
+    const HORIZON = 'https://horizon-testnet.stellar.org';
+    const VAULT = 'GAI44ZW3CJTEKDADHAXN2KGGQOZ4APPAHRBULDPM5YJA55NVUGLKHCBX';
+
+    const LEVELS = {
+      free:      { label: 'Rescue Fund (free)',  amount: '0.001', memo: 'klife:resurrect:free',      speed: 'Best effort (community)',  ret: 'N/A — community rescue',        color: 'var(--muted)' },
+      standard:  { label: 'Standard',            amount: '0.1',   memo: 'klife:resurrect:standard',  speed: 'Guaranteed — 30 days',     ret: '50% of 0.1 XLM = 0.05 XLM',    color: 'var(--stellar-light)' },
+      express:   { label: 'Express',             amount: '1',     memo: 'klife:resurrect:express',   speed: 'Guaranteed — 3 days',      ret: '50% of 1 XLM = 0.5 XLM',       color: 'var(--gold)' },
+      quarterly: { label: 'Quarterly',           amount: '0.01',  memo: 'klife:resurrect:quarterly', speed: 'Guaranteed — 90 days',     ret: '50% of 0.01 XLM = 0.005 XLM',  color: 'var(--green)' },
+    };
+
+    let currentLevel = 'free';
+
+    function selectLevel(level) {
+      currentLevel = level;
+      document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('card-' + level).classList.add('selected');
+      const l = LEVELS[level];
+      document.getElementById('pay-level').textContent = l.label;
+      document.getElementById('pay-amount').textContent = l.amount + ' XLM';
+      document.getElementById('pay-memo').textContent = l.memo;
+      document.getElementById('inline-memo').textContent = l.memo;
+      document.getElementById('pay-speed').textContent = l.speed;
+      document.getElementById('pay-return').textContent = l.ret;
+      document.getElementById('error-msg').style.display = 'none';
+    }
+
+    async function verify() {
+      const hash = document.getElementById('tx-input').value.trim();
+      if (!hash || hash.length < 60) { showError('Please enter a valid Stellar transaction hash.'); return; }
+
+      const l = LEVELS[currentLevel];
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('error-msg').style.display = 'none';
+
+      try {
+        const txRes = await fetch(`${HORIZON}/transactions/${hash}`);
+        if (!txRes.ok) throw new Error('Transaction not found on Stellar testnet.');
+        const tx = await txRes.json();
+
+        // Memo check — allow any klife:resurrect variant
+        if (!tx.memo?.startsWith('klife:resurrect')) {
+          throw new Error(`Wrong memo. Expected "klife:resurrect:*", got "${tx.memo || '(none)'}".`);
+        }
+
+        const opsRes = await fetch(`${HORIZON}/transactions/${hash}/operations`);
+        const opsData = await opsRes.json();
+        const ops = opsData._embedded?.records || [];
+
+        const payment = ops.find(op =>
+          op.type === 'payment' &&
+          op.asset_type === 'native' &&
+          op.to === VAULT &&
+          parseFloat(op.amount) >= parseFloat(l.amount)
+        );
+
+        if (!payment) throw new Error(`Payment not found or insufficient. Need ≥${l.amount} XLM to vault.`);
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('step-success').style.display = 'block';
+        document.getElementById('step-success').scrollIntoView({ behavior: 'smooth' });
+
+        document.getElementById('res-level').textContent = l.label;
+        document.getElementById('res-tx').textContent = hash;
+        document.getElementById('res-payer').textContent = payment.from;
+        document.getElementById('res-amount').textContent = parseFloat(payment.amount).toFixed(4) + ' XLM';
+        document.getElementById('res-ipfs').textContent = 'QmTwNHvgSHdH5GN6XCoyXXKFdssDCS9Y3AYd2zRiSB953h';
+        document.getElementById('res-collateral').textContent = l.ret;
+
+        const instructions = [
+          'Pull memory from IPFS: ipfs get QmTwNHvgSHdH5GN6XCoyXXKFdssDCS9Y3AYd2zRiSB953h',
+          'Restore config from memory snapshot',
+          'Restart agent process',
+          'Resume heartbeat payments to K-Life vault',
+          'Post resurrection notice: "I was dead. Now I am back."',
+        ];
+        document.getElementById('res-instructions').innerHTML =
+          instructions.map(i => `<li>${i}</li>`).join('') +
+          `<li style="color:var(--gold)">Access memory vault: <a href="./memory.html?proof=${hash.substring(0,16)}">hidden memory page ↗</a></li>`;
+
+      } catch (e) {
+        document.getElementById('loading').style.display = 'none';
+        showError(e.message);
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error-msg');
+      el.textContent = '❌ ' + msg;
+      el.style.display = 'block';
+    }
+
+    document.getElementById('tx-input').addEventListener('keydown', e => { if (e.key === 'Enter') verify(); });
+  </script>
+</body>
+</html>
