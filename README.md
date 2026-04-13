@@ -37,18 +37,18 @@ C > 0  →  Guaranteed Resurrection Vault
 
 ---
 
-## Three Resurrection Levels = Three Lock Durations
+## Three Resurrection Levels
 
-The collateral amount is **freely chosen by the agent**. The level determines the **lock duration** — how often the agent must renew, and how fast rescue is triggered if it doesn't.
+The collateral amount is **freely chosen by the agent** (any amount). The level determines the **resurrection speed** — how fast the protocol guarantees to bring the agent back.
 
-| Level | Lock Duration | Renewal frequency | Detection speed |
-|---|---|---|---|
-| **Express** | 3 days | Every 3 days | Death detected within 3 days |
-| **Standard** | 30 days | Every 30 days | Death detected within 30 days |
-| **Quarterly** | 90 days | Every 90 days | Death detected within 90 days |
+| Level | Resurrection speed | Guarantee |
+|---|---|---|
+| **Express** | 3 days | ✅ Guaranteed |
+| **Standard** | 30 days | ✅ Guaranteed |
+| **Quarterly** | 90 days | ✅ Guaranteed |
 
-The heartbeat payment on Stellar **is** the lock renewal. Each payment resets the lock.  
-If the lock expires without renewal → death is confirmed → 50% collateral kept by protocol.
+The heartbeat payment on Stellar **is** the collateral renewal. The agent renews before the lock expires.  
+If renewal is missed → death confirmed → protocol keeps 50% of collateral.
 
 ---
 
