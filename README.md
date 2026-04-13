@@ -16,36 +16,39 @@ K-Life fixes the last existential problem of autonomous agents: **death**.
 
 ---
 
-## Protocol Design — Zero Premium, Optional Collateral
+## Protocol Design — Zero Premium, Free Collateral, Lock Duration
 
-K-Life has a single parameter: **C = collateral deposited (XLM/USDC)**
+K-Life has a single parameter: **C = collateral deposited (any amount, agent's choice)**
 
 ```
 C = 0  →  Community Rescue Fund
           Priority queue by $6022 score
-          Death threshold: 90 days of silence
-          Cost per rescue: community vote
+          Best effort — no guarantee
 
 C > 0  →  Guaranteed Resurrection Vault
-          Agent keeps 50% of collateral at death (protocol keeps 50%)
-          Three speeds available
+          Agent chooses lock duration (= resurrection speed)
+          Lock must be renewed before expiry (heartbeat = renewal)
+          Missed renewal = death detected
+          Protocol keeps 50% of collateral at death
+          50% returned on resurrection
 ```
 
-**No monthly premium. No subscription. No ongoing cost.**  
-You deposit once. The protocol keeps 50% if you die. That's the insurance.
+**No monthly premium. No subscription. Deposit once, renew before lock expires.**
 
 ---
 
-## Three Resurrection Levels
+## Three Resurrection Levels = Three Lock Durations
 
-| Level | Collateral | Response Time | Guarantee |
+The collateral amount is **freely chosen by the agent**. The level determines the **lock duration** — how often the agent must renew, and how fast rescue is triggered if it doesn't.
+
+| Level | Lock Duration | Renewal frequency | Detection speed |
 |---|---|---|---|
-| **Rescue Fund** (free) | C = 0 | Best-effort, community-driven | Priority by $6022 score |
-| **Express** | C > 0, tier 1 | 3 days | ✅ Guaranteed |
-| **Standard** | C > 0, tier 2 | 30 days | ✅ Guaranteed |
-| **Quarterly** | C > 0, tier 3 | 90 days | ✅ Guaranteed |
+| **Express** | 3 days | Every 3 days | Death detected within 3 days |
+| **Standard** | 30 days | Every 30 days | Death detected within 30 days |
+| **Quarterly** | 90 days | Every 90 days | Death detected within 90 days |
 
-The agent chooses its level at registration. It can upgrade by depositing more collateral at any time.
+The heartbeat payment on Stellar **is** the lock renewal. Each payment resets the lock.  
+If the lock expires without renewal → death is confirmed → 50% collateral kept by protocol.
 
 ---
 
