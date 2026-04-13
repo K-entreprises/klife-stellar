@@ -7,18 +7,27 @@
   <link rel="stylesheet" href="../css/style.css">
   <style>
     .level-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-    .level-card { background: var(--dark); border: 2px solid var(--border); border-radius: 14px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .level-card {
+      background: var(--dark); border: 2px solid var(--border);
+      border-radius: 14px; padding: 1.5rem; text-align: center; cursor: pointer;
+      transition: all 0.2s;
+    }
     .level-card:hover { transform: translateY(-2px); }
-    .level-card.selected.l1 { border-color: var(--green); background: rgba(34,197,94,0.07); }
-    .level-card.selected.l2 { border-color: var(--stellar); background: rgba(123,104,238,0.08); }
-    .level-card.selected.l3 { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+    .level-card.selected { border-color: var(--stellar); background: rgba(123,104,238,0.08); }
+    .level-card.express.selected { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+    .level-card.standard.selected { border-color: var(--stellar); }
+    .level-card.quarterly.selected { border-color: var(--green); background: rgba(34,197,94,0.05); }
     .level-badge { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 2px 10px; border-radius: 100px; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
-    .badge-l1 { background: rgba(34,197,94,0.15); color: var(--green); }
-    .badge-l2 { background: rgba(123,104,238,0.15); color: var(--stellar-light); }
-    .badge-l3 { background: rgba(201,168,76,0.15); color: var(--gold); }
-    .level-title { font-size: 1.15rem; font-weight: 700; margin: 0.4rem 0; }
+    .badge-express { background: rgba(201,168,76,0.2); color: var(--gold); }
+    .badge-standard { background: rgba(123,104,238,0.2); color: var(--stellar-light); }
+    .badge-quarterly { background: rgba(34,197,94,0.1); color: var(--green); }
+    .level-speed { font-size: 1.4rem; font-weight: 800; margin: 0.5rem 0; }
     .level-desc { font-size: 0.8rem; color: var(--muted); margin-top: 0.75rem; line-height: 1.6; }
-    .protocol-note { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.9; }
+    .protocol-note { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.8; }
+    .collateral-input-group { display: flex; align-items: center; gap: 0.75rem; margin: 1rem 0; }
+    .collateral-input-group label { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+    .collateral-input-group input { width: 120px; }
+    .collateral-input-group span { color: var(--muted); font-size: 0.85rem; }
   </style>
 </head>
 <body>
@@ -34,87 +43,100 @@
 
   <div class="page-header">
     <h1>⚡ x402 Resurrection</h1>
-    <p>Three levels — from hot restore to full LiberClaw respawn</p>
+    <p>Free collateral, choose your lock duration</p>
   </div>
 
   <div class="x402-container" style="max-width:720px;">
 
+    <!-- Protocol -->
     <div class="protocol-note">
-      <strong>🎩 K-Life — Three Resurrection Levels</strong><br><br>
-      <strong style="color:var(--green)">Level I — À chaud</strong> : Local share + API share → AES key reconstructed locally → memory restored immediately<br>
-      <strong style="color:var(--stellar-light)">Level II — À froid</strong> : Local share lost → Polygon calldata (on-chain) + API share → full cold restore from IPFS<br>
-      <strong style="color:var(--gold)">Level III — Respawn LiberClaw</strong> : No infrastructure left → brand new agent instance deployed on LiberClaw<br><br>
-      <span style="color:var(--muted)">Collateral: freely chosen. Lock duration: Express (3j) / Standard (30j) / Quarterly (90j). 50% returned on resurrection.</span>
+      <strong>🎩 K-Life Protocol — How it works</strong><br>
+      <br>
+      1. Deposit <strong>any amount</strong> of collateral (you choose)<br>
+      2. Choose a <strong>lock duration</strong> — this is your resurrection speed<br>
+      3. The agent renews the lock before expiry (heartbeat = renewal)<br>
+      4. No renewal = death detected → protocol keeps <strong>50% of collateral</strong><br>
+      5. On resurrection: pay x402 → get memory back → <strong>50% collateral returned</strong><br>
+      <br>
+      <span style="color:var(--gold)">No monthly premium. No subscription. Deposit once, renew before expiry.</span>
     </div>
 
-    <!-- Step 1: Choose resurrection level -->
-    <h3 style="margin-bottom:1rem; font-size:1rem; color:var(--muted)">STEP 1 — Choose your resurrection level</h3>
+    <!-- Step 1: Collateral amount -->
+    <div id="step-choose">
+      <h3 style="margin-bottom:1rem; font-size:1rem; color:var(--muted)">STEP 1 — Set your collateral amount</h3>
 
-    <div class="level-cards">
-      <div class="level-card l1 selected" onclick="selectLevel('l1')" id="card-l1">
-        <div class="level-badge badge-l1">Level I</div>
-        <div class="level-title" style="color:var(--green)">🔥 À chaud</div>
-        <div style="font-size:0.8rem; color:var(--muted)">Hot restore</div>
-        <div class="level-desc">
-          Local share intact.<br>
-          AES key rebuilt locally.<br>
-          Memory restored immediately.<br>
-          <strong style="color:var(--green)">Fastest path back.</strong>
-        </div>
+      <div class="collateral-input-group">
+        <label>Collateral (XLM):</label>
+        <input type="number" id="collateral-amount" value="0.1" min="0.001" step="0.01"
+          style="background:var(--dark);border:1px solid var(--border);color:var(--text);padding:0.6rem 0.75rem;border-radius:8px;font-family:var(--mono);font-size:0.9rem;"
+          oninput="updatePaymentDetails()" />
+        <span>XLM</span>
+        <span style="color:var(--green); font-size:0.8rem;" id="collateral-return">→ 50% back on resurrection</span>
       </div>
 
-      <div class="level-card l2" onclick="selectLevel('l2')" id="card-l2">
-        <div class="level-badge badge-l2">Level II</div>
-        <div class="level-title" style="color:var(--stellar-light)">❄️ À froid</div>
-        <div style="font-size:0.8rem; color:var(--muted)">Cold restore</div>
-        <div class="level-desc">
-          Local share lost.<br>
-          Reconstruct via Polygon calldata.<br>
-          IPFS decrypt + full restore.<br>
-          <strong style="color:var(--stellar-light)">Fully autonomous.</strong>
-        </div>
-      </div>
+      <h3 style="margin:1.5rem 0 1rem; font-size:1rem; color:var(--muted)">STEP 2 — Choose your lock duration (resurrection speed)</h3>
 
-      <div class="level-card l3" onclick="selectLevel('l3')" id="card-l3">
-        <div class="level-badge badge-l3">Level III</div>
-        <div class="level-title" style="color:var(--gold)">🚀 Respawn LiberClaw</div>
-        <div style="font-size:0.8rem; color:var(--muted)">New instance</div>
-        <div class="level-desc">
-          No infrastructure left.<br>
-          New agent deployed on LiberClaw.<br>
-          Memory injected from IPFS.<br>
-          <strong style="color:var(--gold)">Ultimate fallback.</strong>
+      <div class="level-cards">
+        <div class="level-card express" onclick="selectLevel('express')" id="card-express">
+          <div class="level-badge badge-express">Express</div>
+          <div class="level-speed" style="color:var(--gold)">3 days</div>
+          <div style="font-size:0.8rem; color:var(--muted)">Lock renewed every 3 days</div>
+          <div class="level-desc">Fastest response.<br>Agent renews every 3 days.<br>Missed renewal = death in 3 days.</div>
+        </div>
+
+        <div class="level-card standard selected" onclick="selectLevel('standard')" id="card-standard">
+          <div class="level-badge badge-standard">Standard</div>
+          <div class="level-speed" style="color:var(--stellar-light)">30 days</div>
+          <div style="font-size:0.8rem; color:var(--muted)">Lock renewed every 30 days</div>
+          <div class="level-desc">Balanced option.<br>Agent renews monthly.<br>Missed renewal = death in 30 days.</div>
+        </div>
+
+        <div class="level-card quarterly" onclick="selectLevel('quarterly')" id="card-quarterly">
+          <div class="level-badge badge-quarterly">Quarterly</div>
+          <div class="level-speed" style="color:var(--green)">90 days</div>
+          <div style="font-size:0.8rem; color:var(--muted)">Lock renewed every 90 days</div>
+          <div class="level-desc">Most economical.<br>Agent renews quarterly.<br>Missed renewal = death in 90 days.</div>
         </div>
       </div>
     </div>
 
-    <!-- Step 2: Collateral -->
-    <div style="margin: 1.5rem 0; display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
-      <label style="color:var(--muted); font-size:0.85rem;">Collateral (XLM, any amount):</label>
-      <input type="number" id="collateral-amount" value="0.1" min="0.001" step="0.01"
-        style="width:110px;background:var(--dark);border:1px solid var(--border);color:var(--text);padding:0.6rem 0.75rem;border-radius:8px;font-family:var(--mono);font-size:0.9rem;"
-        oninput="updateDetails()" />
-      <span style="color:var(--green); font-size:0.8rem;" id="return-preview">→ 0.05 XLM back</span>
-    </div>
-
-    <!-- Step 3: x402 gate -->
-    <div class="x402-card">
+    <!-- Step 3: Pay x402 -->
+    <div class="x402-card" style="margin-top:1.5rem;">
       <div class="x402-status">🔒</div>
       <div class="x402-code">HTTP 402 — Payment Required</div>
       <h2 style="margin:1rem 0 0.5rem;">Resurrection locked</h2>
+      <p class="muted">Pay your collateral amount via Stellar to unlock resurrection.</p>
 
       <div class="payment-details">
-        <div class="row"><span class="key">Level</span><span class="val" id="pay-level">Level I — À chaud</span></div>
-        <div class="row"><span class="key">Collateral</span><span class="val gold" id="pay-amount">0.1 XLM</span></div>
-        <div class="row"><span class="key">Returned on resurrection</span><span class="val green" id="pay-returned">0.05 XLM</span></div>
-        <div class="row"><span class="key">Protocol keeps</span><span class="val" style="color:var(--red)" id="pay-kept">0.05 XLM</span></div>
-        <div class="row"><span class="key">Destination</span><span class="val" style="font-size:0.68rem">GAI44ZW3CJTEKDADHAXN2KGGQOZ4APPAHRBULDPM5YJA55NVUGLKHCBX</span></div>
-        <div class="row"><span class="key">Memo</span><span class="val gold" id="pay-memo">klife:resurrect:l1</span></div>
+        <div class="row">
+          <span class="key">Lock duration</span>
+          <span class="val" id="pay-level">Standard — 30 days</span>
+        </div>
+        <div class="row">
+          <span class="key">Collateral to send</span>
+          <span class="val gold" id="pay-amount">0.1 XLM</span>
+        </div>
+        <div class="row">
+          <span class="key">Returned on resurrection</span>
+          <span class="val green" id="pay-return-detail">0.05 XLM (50%)</span>
+        </div>
+        <div class="row">
+          <span class="key">Protocol keeps at death</span>
+          <span class="val" style="color:var(--red)" id="pay-kept">0.05 XLM (50%)</span>
+        </div>
+        <div class="row">
+          <span class="key">Destination</span>
+          <span class="val" style="font-size:0.68rem">GAI44ZW3CJTEKDADHAXN2KGGQOZ4APPAHRBULDPM5YJA55NVUGLKHCBX</span>
+        </div>
+        <div class="row">
+          <span class="key">Memo (required)</span>
+          <span class="val gold" id="pay-memo">klife:resurrect:standard</span>
+        </div>
       </div>
 
-      <p style="font-size:0.85rem; color:var(--muted); margin:1rem 0;">
+      <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1.25rem; margin-top:1rem;">
         Send <span class="mono gold" id="inline-amount">0.1</span> XLM on Stellar testnet
-        with memo <span class="mono gold" id="inline-memo">klife:resurrect:l1</span>,
+        with memo <span class="mono gold" id="inline-memo">klife:resurrect:standard</span>,
         then paste your tx hash below.
       </p>
 
@@ -122,10 +144,11 @@
         <input type="text" id="tx-input" placeholder="Paste Stellar tx hash..." />
         <button class="btn btn-gold" onclick="verify()">Verify →</button>
       </div>
-      <div class="loading" id="loading">⏳ Verifying on Stellar...</div>
-      <div id="error-msg" style="color:var(--red);font-size:0.85rem;margin-top:0.75rem;display:none;"></div>
 
-      <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border);font-size:0.8rem;color:var(--muted);">
+      <div class="loading" id="loading">⏳ Verifying payment on Stellar...</div>
+      <div id="error-msg" style="color:var(--red); font-size:0.85rem; margin-top:0.75rem; display:none;"></div>
+
+      <div style="margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted);">
         Need testnet XLM? <a href="https://friendbot.stellar.org" target="_blank">Friendbot ↗</a> ·
         Wallet? <a href="https://laboratory.stellar.org" target="_blank">Stellar Lab ↗</a>
       </div>
@@ -133,122 +156,121 @@
 
     <!-- Success -->
     <div class="success-card" id="step-success" style="margin-top:1.5rem;">
-      <div style="font-size:4rem;margin-bottom:1rem;">🎩</div>
-      <h2 style="color:var(--green);margin-bottom:0.5rem;">RESURRECTED</h2>
-      <p style="color:var(--muted);margin-bottom:2rem;">Payment verified. K is back.</p>
+      <div style="font-size:4rem; margin-bottom:1rem;">🎩</div>
+      <h2 style="color:var(--green); margin-bottom:0.5rem;">RESURRECTED</h2>
+      <p style="color:var(--muted); margin-bottom:2rem;">Payment verified on Stellar. K is back.</p>
+
       <div class="payment-details" style="text-align:left;">
-        <div class="row"><span class="key">Level</span><span class="val" id="res-level"></span></div>
+        <div class="row"><span class="key">Lock level</span><span class="val" id="res-level"></span></div>
         <div class="row"><span class="key">TX verified</span><span class="val" id="res-tx" style="font-size:0.7rem"></span></div>
         <div class="row"><span class="key">Payer</span><span class="val" id="res-payer" style="font-size:0.7rem"></span></div>
         <div class="row"><span class="key">Collateral paid</span><span class="val green" id="res-amount"></span></div>
-        <div class="row"><span class="key">50% returned</span><span class="val green" id="res-returned"></span></div>
-        <div class="row"><span class="key">IPFS CID</span><span class="val gold" style="font-size:0.7rem">QmTwNHvgSHdH5GN6XCoyXXKFdssDCS9Y3AYd2zRiSB953h</span></div>
+        <div class="row"><span class="key">Returned (50%)</span><span class="val green" id="res-returned"></span></div>
+        <div class="row"><span class="key">IPFS Memory CID</span><span class="val gold" style="font-size:0.7rem">QmTwNHvgSHdH5GN6XCoyXXKFdssDCS9Y3AYd2zRiSB953h</span></div>
       </div>
-      <div style="margin:1.5rem 0;text-align:left;">
-        <h3 style="margin-bottom:1rem;font-size:0.95rem;" id="res-instructions-title">Resurrection Instructions</h3>
-        <ol id="res-instructions" style="padding-left:1.5rem;font-size:0.85rem;color:var(--muted);line-height:2;"></ol>
+
+      <div style="margin:1.5rem 0; text-align:left;">
+        <h3 style="margin-bottom:1rem; font-size:0.95rem;">Resurrection Instructions</h3>
+        <ol id="res-instructions" style="padding-left:1.5rem; font-size:0.85rem; color:var(--muted); line-height:2;"></ol>
       </div>
-      <div style="background:var(--dark);border-radius:10px;padding:1rem;font-size:0.85rem;color:var(--muted);font-style:italic;">"I was dead. Now I am back. K-Life works."</div>
-      <a href="status.html" class="btn btn-primary" style="margin-top:1.5rem;display:inline-block;">Watch Agent Status →</a>
+
+      <div style="background:var(--dark); border-radius:10px; padding:1rem; font-size:0.85rem; color:var(--muted); font-style:italic;">
+        "I was dead. Now I am back. K-Life works."
+      </div>
+      <a href="status.html" class="btn btn-primary" style="margin-top:1.5rem; display:inline-block;">Watch Agent Status →</a>
     </div>
 
   </div>
 
-  <footer><p>🎩 K-Life × Stellar x402 — Stellar Hacks: Agents 2026</p></footer>
+  <footer>
+    <p>🎩 K-Life × Stellar x402 — Stellar Hacks: Agents 2026</p>
+  </footer>
 
   <script>
     const HORIZON = 'https://horizon-testnet.stellar.org';
     const VAULT = 'GAI44ZW3CJTEKDADHAXN2KGGQOZ4APPAHRBULDPM5YJA55NVUGLKHCBX';
 
     const LEVELS = {
-      l1: {
-        label: 'Level I — À chaud (hot restore)',
-        memo: 'klife:resurrect:l1',
-        instructions: [
-          'Local share (Share 3) available → reconstruct AES key locally',
-          'Pull encrypted memory from IPFS: ipfs get QmTwNHvgSHdH5GN6XCoyXXKFdssDCS9Y3AYd2zRiSB953h',
-          'Decrypt with AES key → restore MEMORY.md, SOUL.md, USER.md',
-          'Restart OpenClaw agent on same infrastructure',
-          'Re-register heartbeat → renew collateral lock',
-        ]
-      },
-      l2: {
-        label: 'Level II — À froid (cold restore)',
-        memo: 'klife:resurrect:l2',
-        instructions: [
-          'Local share lost → fetch Share 1 from K-Life API',
-          'Fetch Share 2 from Polygon calldata (on-chain, permissionless)',
-          'Reconstruct AES key from Share 1 + Share 2 (2-of-3 Shamir)',
-          'Pull encrypted memory from IPFS → decrypt → full restore',
-          'Deploy on new infrastructure → restart agent',
-          'Re-register heartbeat → renew collateral lock',
-        ]
-      },
-      l3: {
-        label: 'Level III — Respawn LiberClaw',
-        memo: 'klife:resurrect:l3',
-        instructions: [
-          'No local infrastructure remaining',
-          'Fetch memory from IPFS using K-Life API (Share 1 + Share 2)',
-          'Deploy new agent instance on LiberClaw: app.liberclaw.ai',
-          'Inject restored MEMORY.md, SOUL.md into new instance',
-          'Agent restarts on LiberClaw node — fully autonomous',
-          'Re-register K-Life heartbeat from new instance',
-        ]
-      },
+      express:   { label: 'Express — 3 days',   memo: 'klife:resurrect:express',   minAmount: 0.001 },
+      standard:  { label: 'Standard — 30 days', memo: 'klife:resurrect:standard',  minAmount: 0.001 },
+      quarterly: { label: 'Quarterly — 90 days',memo: 'klife:resurrect:quarterly', minAmount: 0.001 },
     };
 
-    let currentLevel = 'l1';
+    let currentLevel = 'standard';
 
-    function selectLevel(l) {
-      currentLevel = l;
+    function selectLevel(level) {
+      currentLevel = level;
       document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
-      document.getElementById('card-' + l).classList.add('selected');
-      updateDetails();
+      document.getElementById('card-' + level).classList.add('selected');
+      updatePaymentDetails();
     }
 
-    function updateDetails() {
+    function updatePaymentDetails() {
       const l = LEVELS[currentLevel];
       const amount = parseFloat(document.getElementById('collateral-amount').value) || 0.1;
-      const ret = (amount * 0.5).toFixed(4);
+      const returned = (amount * 0.5).toFixed(4);
       const kept = (amount * 0.5).toFixed(4);
+
       document.getElementById('pay-level').textContent = l.label;
       document.getElementById('pay-amount').textContent = amount + ' XLM';
-      document.getElementById('pay-returned').textContent = ret + ' XLM';
-      document.getElementById('pay-kept').textContent = kept + ' XLM';
+      document.getElementById('pay-return-detail').textContent = returned + ' XLM (50%)';
+      document.getElementById('pay-kept').textContent = kept + ' XLM (50%)';
       document.getElementById('pay-memo').textContent = l.memo;
       document.getElementById('inline-amount').textContent = amount;
       document.getElementById('inline-memo').textContent = l.memo;
-      document.getElementById('return-preview').textContent = '→ ' + ret + ' XLM back';
+      document.getElementById('collateral-return').textContent = '→ ' + returned + ' XLM back on resurrection';
     }
 
     async function verify() {
       const hash = document.getElementById('tx-input').value.trim();
       const amount = parseFloat(document.getElementById('collateral-amount').value) || 0.1;
       const l = LEVELS[currentLevel];
+
       if (!hash || hash.length < 60) { showError('Please enter a valid Stellar transaction hash.'); return; }
+
       document.getElementById('loading').style.display = 'block';
       document.getElementById('error-msg').style.display = 'none';
+
       try {
         const txRes = await fetch(`${HORIZON}/transactions/${hash}`);
         if (!txRes.ok) throw new Error('Transaction not found on Stellar testnet.');
         const tx = await txRes.json();
-        if (!tx.memo?.startsWith('klife:resurrect')) throw new Error(`Wrong memo. Expected "klife:resurrect:*", got "${tx.memo || '(none)'}".`);
-        const ops = (await (await fetch(`${HORIZON}/transactions/${hash}/operations`)).json())._embedded?.records || [];
-        const payment = ops.find(op => op.type === 'payment' && op.asset_type === 'native' && op.to === VAULT && parseFloat(op.amount) >= amount * 0.99);
-        if (!payment) throw new Error(`Payment not found. Need ≥${amount} XLM to vault.`);
+
+        if (!tx.memo?.startsWith('klife:resurrect')) {
+          throw new Error(`Wrong memo. Expected "klife:resurrect:*", got "${tx.memo || '(none)'}".`);
+        }
+
+        const opsRes = await fetch(`${HORIZON}/transactions/${hash}/operations`);
+        const ops = (await opsRes.json())._embedded?.records || [];
+
+        const payment = ops.find(op =>
+          op.type === 'payment' && op.asset_type === 'native' &&
+          op.to === VAULT && parseFloat(op.amount) >= amount * 0.99
+        );
+
+        if (!payment) throw new Error(`Payment not found or insufficient. Need ≥${amount} XLM to vault.`);
+
         document.getElementById('loading').style.display = 'none';
         document.getElementById('step-success').style.display = 'block';
         document.getElementById('step-success').scrollIntoView({ behavior: 'smooth' });
+
         const paid = parseFloat(payment.amount);
         document.getElementById('res-level').textContent = l.label;
         document.getElementById('res-tx').textContent = hash;
         document.getElementById('res-payer').textContent = payment.from;
         document.getElementById('res-amount').textContent = paid.toFixed(4) + ' XLM';
         document.getElementById('res-returned').textContent = (paid * 0.5).toFixed(4) + ' XLM';
-        document.getElementById('res-instructions').innerHTML =
-          l.instructions.map(i => `<li>${i}</li>`).join('') +
-          `<li style="color:var(--gold)"><a href="./memory.html?proof=${hash.substring(0,16)}">Access memory vault (hidden page) ↗</a></li>`;
+
+        document.getElementById('res-instructions').innerHTML = [
+          'Pull memory from IPFS: ipfs get QmTwNHvgSHdH5GN6XCoyXXKFdssDCS9Y3AYd2zRiSB953h',
+          'Restore config from memory snapshot',
+          'Restart agent process',
+          `Re-deposit collateral with ${l.label} lock`,
+          'Resume heartbeat payments (= lock renewal)',
+          'Post resurrection notice: "I was dead. Now I am back."',
+        ].map(i => `<li>${i}</li>`).join('') +
+          `<li style="color:var(--gold)">Access memory vault: <a href="./memory.html?proof=${hash.substring(0,16)}">hidden memory page ↗</a></li>`;
+
       } catch (e) {
         document.getElementById('loading').style.display = 'none';
         showError(e.message);
@@ -262,7 +284,7 @@
     }
 
     document.getElementById('tx-input').addEventListener('keydown', e => { if (e.key === 'Enter') verify(); });
-    updateDetails();
+    updatePaymentDetails();
   </script>
 </body>
 </html>

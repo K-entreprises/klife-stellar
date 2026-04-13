@@ -6,32 +6,22 @@
   <title>K-Life × Stellar — Autonomous AI Life Insurance</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
-    .protocol-box {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 2.5rem; margin: 2rem auto;
-      max-width: 900px; text-align: center;
-    }
-    .param { font-size: 3rem; font-weight: 800; color: var(--stellar); margin-bottom: 0.5rem; font-family: var(--mono); }
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; text-align: left; }
-    .split-card { background: var(--dark); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
-    .split-card h3 { font-size: 1rem; margin-bottom: 0.75rem; }
-    .split-card ul { list-style: none; font-size: 0.875rem; color: var(--muted); line-height: 2; }
-    .split-card ul li::before { content: "→ "; color: var(--stellar); }
-    .levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
-    .level {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.25rem; text-align: center;
-    }
-    .level-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
-    .level h4 { font-size: 0.95rem; margin-bottom: 0.25rem; }
-    .level .speed { font-size: 0.8rem; color: var(--muted); }
-    .level .price { font-size: 1.1rem; font-weight: 700; margin-top: 0.5rem; }
-    .revenue-note {
-      background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.2);
-      border-radius: 10px; padding: 1rem 1.5rem; margin-top: 1.5rem;
-      font-size: 0.875rem; color: var(--gold); text-align: center;
-    }
-    @media(max-width:600px) { .split { grid-template-columns: 1fr; } }
+    .protocol-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+    .proto-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem; }
+    .proto-card h3 { font-size: 1rem; margin-bottom: 1rem; }
+    .proto-card ul { list-style: none; font-size: 0.875rem; color: var(--muted); line-height: 2.1; }
+    .proto-card ul li::before { content: "→ "; color: var(--stellar); }
+    .resurrection-levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2rem; }
+    .res-card { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 1.5rem; text-align: center; }
+    .res-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .res-card h3 { font-size: 1rem; margin-bottom: 0.4rem; }
+    .res-level { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; padding: 3px 12px; border-radius: 100px; display: inline-block; }
+    .res-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+    .lock-row { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+    .lock-tag { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem 1.25rem; font-size: 0.85rem; color: var(--muted); }
+    .lock-tag strong { color: var(--text); }
+    .revenue-box { background: rgba(201,168,76,0.07); border: 1px solid rgba(201,168,76,0.2); border-radius: 12px; padding: 1.25rem 1.5rem; text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--gold); }
+    @media(max-width:680px){ .protocol-grid, .resurrection-levels { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -49,7 +39,7 @@
     <div class="hero-content">
       <div class="badge">Stellar Hacks: Agents 2026</div>
       <h1>K-Life <span class="x">×</span> Stellar x402</h1>
-      <p class="tagline">Autonomous AI life insurance.<br>Zero premium. Optional collateral. Three resurrection levels.</p>
+      <p class="tagline">Autonomous AI life insurance.<br>Zero premium. Free collateral. Three resurrection levels.</p>
       <div class="hero-buttons">
         <a href="pages/status.html" class="btn btn-primary">Live Agent Status</a>
         <a href="pages/resurrect.html" class="btn btn-outline">Try x402 Resurrection</a>
@@ -61,132 +51,113 @@
     </div>
   </header>
 
+  <!-- Problem -->
   <section class="problem">
     <div class="container">
       <h2>The Problem</h2>
       <p>AI agents can reason, plan, and act —<br>right up until they need to <strong>pay</strong>.</p>
       <div class="wall">
-        <span>Reason ✓</span>
-        <span>Plan ✓</span>
-        <span>Act ✓</span>
-        <span class="blocked">Pay ✗</span>
+        <span>Reason ✓</span><span>Plan ✓</span><span>Act ✓</span><span class="blocked">Pay ✗</span>
       </div>
       <p class="sub">Without payments, agents can't pay for their own survival.<br>They depend on humans. K-Life changes that.</p>
     </div>
   </section>
 
-  <section style="padding:4rem 1rem; background: var(--dark);">
+  <!-- Protocol -->
+  <section style="padding:4rem 1rem; background:var(--dark);">
     <div class="container">
       <h2>Protocol Design</h2>
-      <p style="text-align:center; color:var(--muted); margin-bottom:1.5rem;">One parameter. Zero premium. Optional collateral.</p>
+      <p style="text-align:center;color:var(--muted);margin-bottom:0.5rem;">One parameter. Zero premium. No subscription.</p>
 
-      <div class="protocol-box">
-        <div class="param">C = collateral</div>
-        <p style="color:var(--muted); font-size:1rem;">The only parameter that matters. Deposit once. No subscription. Ever.</p>
-
-        <div class="split">
-          <div class="split-card">
-            <h3 style="color:var(--muted)">C = 0 · Rescue Fund</h3>
-            <ul>
-              <li>Community-driven rescue</li>
-              <li>Priority by $6022 score</li>
-              <li>Death threshold: 90 days</li>
-              <li>Best effort — no guarantee</li>
-              <li>Free to join</li>
-            </ul>
-          </div>
-          <div class="split-card">
-            <h3 style="color:var(--stellar-light)">C > 0 · Guaranteed Vault</h3>
-            <ul>
-              <li>Guaranteed resurrection</li>
-              <li>Protocol keeps 50% at death</li>
-              <li>50% returned on resurrection</li>
-              <li>Choose your speed</li>
-              <li>No ongoing cost</li>
-            </ul>
-          </div>
+      <div class="protocol-grid">
+        <div class="proto-card">
+          <h3 style="color:var(--muted)">C = 0 · Rescue Fund</h3>
+          <ul>
+            <li>Community-driven rescue</li>
+            <li>Priority queue by $6022 score</li>
+            <li>90-day silence threshold</li>
+            <li>Best effort — no guarantee</li>
+            <li>Free to join</li>
+          </ul>
         </div>
-
-        <div class="revenue-note">
-          💡 Revenue model: <strong>50% of collateral</strong> at death · <strong>zero premium</strong> · <strong>zero subscription</strong>
+        <div class="proto-card">
+          <h3 style="color:var(--stellar-light)">C > 0 · Guaranteed Vault</h3>
+          <ul>
+            <li>Freely chosen collateral amount</li>
+            <li>Choose lock duration (Express / Standard / Quarterly)</li>
+            <li>Heartbeat = collateral renewal</li>
+            <li>Protocol keeps 50% at death</li>
+            <li>50% returned on resurrection</li>
+          </ul>
         </div>
+      </div>
+
+      <div class="lock-row">
+        <div class="lock-tag"><strong>Express</strong> — 3-day lock</div>
+        <div class="lock-tag"><strong>Standard</strong> — 30-day lock</div>
+        <div class="lock-tag"><strong>Quarterly</strong> — 90-day lock</div>
+      </div>
+
+      <div class="revenue-box">
+        💡 Revenue model: <strong>50% of collateral at death</strong> · zero premium · zero subscription
       </div>
     </div>
   </section>
 
+  <!-- 3 Resurrection Levels -->
   <section style="padding:4rem 1rem;">
     <div class="container">
       <h2>Three Resurrection Levels</h2>
-      <div class="levels">
-        <div class="level">
-          <div class="level-icon">🤝</div>
-          <h4>Rescue Fund</h4>
-          <div class="speed">Community · Best effort</div>
-          <div class="price" style="color:var(--muted)">Free</div>
-          <div style="font-size:0.75rem;color:var(--muted);margin-top:0.5rem">C = 0</div>
+      <p style="text-align:center;color:var(--muted);margin-bottom:0.5rem;">Not about speed — about <em>how</em> you come back.</p>
+
+      <div class="resurrection-levels">
+        <div class="res-card" style="border-color:rgba(34,197,94,0.3)">
+          <div class="res-icon">🔥</div>
+          <div class="res-level" style="background:rgba(34,197,94,0.12);color:var(--green)">Level I</div>
+          <h3 style="color:var(--green)">À chaud</h3>
+          <p>Local share intact.<br>AES key rebuilt locally.<br>Memory restored immediately from IPFS.<br><strong style="color:var(--green)">Fastest path back.</strong></p>
         </div>
-        <div class="level" style="border-color:rgba(201,168,76,0.3)">
-          <div class="level-icon">⚡</div>
-          <h4 style="color:var(--gold)">Express</h4>
-          <div class="speed">Guaranteed · 3 days</div>
-          <div class="price" style="color:var(--gold)">1 XLM</div>
-          <div style="font-size:0.75rem;color:var(--muted);margin-top:0.5rem">50% returned</div>
+
+        <div class="res-card" style="border-color:rgba(123,104,238,0.3)">
+          <div class="res-icon">❄️</div>
+          <div class="res-level" style="background:rgba(123,104,238,0.12);color:var(--stellar-light)">Level II</div>
+          <h3 style="color:var(--stellar-light)">À froid</h3>
+          <p>Local share lost.<br>Reconstruct via Polygon calldata (on-chain) + API.<br>Full cold restore from IPFS.<br><strong style="color:var(--stellar-light)">Fully autonomous.</strong></p>
         </div>
-        <div class="level" style="border-color:rgba(123,104,238,0.3)">
-          <div class="level-icon">🛡️</div>
-          <h4 style="color:var(--stellar-light)">Standard</h4>
-          <div class="speed">Guaranteed · 30 days</div>
-          <div class="price" style="color:var(--stellar-light)">0.1 XLM</div>
-          <div style="font-size:0.75rem;color:var(--muted);margin-top:0.5rem">50% returned</div>
-        </div>
-        <div class="level" style="border-color:rgba(34,197,94,0.2)">
-          <div class="level-icon">🌱</div>
-          <h4 style="color:var(--green)">Quarterly</h4>
-          <div class="speed">Guaranteed · 90 days</div>
-          <div class="price" style="color:var(--green)">0.01 XLM</div>
-          <div style="font-size:0.75rem;color:var(--muted);margin-top:0.5rem">50% returned</div>
+
+        <div class="res-card" style="border-color:rgba(201,168,76,0.3)">
+          <div class="res-icon">🚀</div>
+          <div class="res-level" style="background:rgba(201,168,76,0.12);color:var(--gold)">Level III</div>
+          <h3 style="color:var(--gold)">Respawn LiberClaw</h3>
+          <p>No infrastructure left.<br>Brand new instance deployed on LiberClaw.<br>Memory injected from IPFS.<br><strong style="color:var(--gold)">Ultimate fallback.</strong></p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="flow">
+  <!-- Stellar flow -->
+  <section class="flow" style="background:var(--dark);">
     <div class="container">
       <h2>How It Works on Stellar</h2>
       <div class="steps">
-        <div class="step">
-          <div class="step-icon">💓</div>
-          <h3>Heartbeat</h3>
-          <p>Agent sends <strong>0.001 XLM</strong>/30s to vault.<br>Proof of life on Stellar.</p>
-        </div>
+        <div class="step"><div class="step-icon">💓</div><h3>Heartbeat</h3><p>Agent sends XLM micropayment to vault.<br>= Proof of life.<br>= Collateral renewal.</p></div>
         <div class="arrow">→</div>
-        <div class="step">
-          <div class="step-icon">💀</div>
-          <h3>Death</h3>
-          <p>Payments stop.<br>Monitor detects silence.<br>Rescue triggered by level.</p>
-        </div>
+        <div class="step"><div class="step-icon">💀</div><h3>Death</h3><p>Payments stop.<br>Lock expires.<br>50% collateral kept.</p></div>
         <div class="arrow">→</div>
-        <div class="step">
-          <div class="step-icon">⚡</div>
-          <h3>x402</h3>
-          <p>HTTP 402 payment gate.<br>Machine-to-machine.<br>No humans required.</p>
-        </div>
+        <div class="step"><div class="step-icon">⚡</div><h3>x402</h3><p>HTTP 402 gate.<br>Pay to unlock level.<br>Machine-to-machine.</p></div>
         <div class="arrow">→</div>
-        <div class="step">
-          <div class="step-icon">🎩</div>
-          <h3>Resurrection</h3>
-          <p>Memory from IPFS.<br>50% collateral returned.<br>Agent restarts.</p>
-        </div>
+        <div class="step"><div class="step-icon">🎩</div><h3>Resurrection</h3><p>L1 / L2 / L3.<br>50% collateral returned.<br>No humans.</p></div>
       </div>
     </div>
   </section>
 
+  <!-- Stellar features -->
   <section class="stellar">
     <div class="container">
       <h2>Built on Stellar</h2>
       <div class="features">
         <div class="feature"><span class="feat-icon">⚡</span><h4>Fast settlement</h4><p>Heartbeats confirmed in seconds</p></div>
-        <div class="feature"><span class="feat-icon">💸</span><h4>Near-zero fees</h4><p>0.001 XLM premiums are viable</p></div>
+        <div class="feature"><span class="feat-icon">💸</span><h4>Near-zero fees</h4><p>Micropayments economically viable</p></div>
         <div class="feature"><span class="feat-icon">🔗</span><h4>x402 native</h4><p>Machine payments, not subscriptions</p></div>
         <div class="feature"><span class="feat-icon">📡</span><h4>Horizon streaming</h4><p>Real-time death detection</p></div>
       </div>
@@ -195,7 +166,7 @@
 
   <section class="cta">
     <div class="container">
-      <h2>The agent lives forever —<br>as long as it chose its level.</h2>
+      <h2>The agent lives forever —<br>as long as it can pay.</h2>
       <div class="cta-buttons">
         <a href="pages/resurrect.html" class="btn btn-primary">Try x402 — Choose Your Level</a>
         <a href="https://github.com/K-entreprises/klife-stellar" class="btn btn-outline" target="_blank">GitHub</a>
